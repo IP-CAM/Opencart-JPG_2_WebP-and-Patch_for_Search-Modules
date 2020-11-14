@@ -1,0 +1,26 @@
+﻿<modification>
+	<name>Patch Search SEO- Encoding Error</name>
+	<code>opencart_patch_search_encoding</code>
+	<version>1.0.1</version>
+	<author>Code: Novikov, Modify: Novikov.ua</author>
+	<link>https://Novikov.ua</link>
+	<file path="catalog/controller/startup/seo_pro.php">
+		<operation>
+			<search><![CDATA[$this->response->redirect($seo);]]></search>
+			<add position="before"><![CDATA[
+
+            $link = parse_url($seo, PHP_URL_QUERY);
+            parse_str($link, $output);
+            if (isset($output['search'])) {
+                $output['search'] = rawurlencode($output['search']);
+                $seo = substr($seo, 0, strpos($seo, '?') + 1) . "search={$output['search']}";
+            }
+            if (isset($output['filter_name'])) {
+                $output['filter_name'] = rawurlencode($output['filter_name']);
+                $seo = substr($seo, 0, strpos($seo, '?') + 1) . "filter_name={$output['filter_name']}";
+            }
+
+			]]></add>
+		</operation>
+	</file>
+</modification>

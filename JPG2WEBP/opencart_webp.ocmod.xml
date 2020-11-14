@@ -1,0 +1,121 @@
+﻿<modification>
+	<name>OpenCart WebP</name>
+	<code>opencart_webp</code>
+	<version>1.0.2</version>
+	<author>Code: Novikov, Modify: Novikov.ua</author>
+	<link>https://opencartforum.com/profile/854396-dddd/, https://ocapplab.com/</link>
+	<file path="admin/controller/common/header.php">
+		<operation>
+			<search><![CDATA[public function index() {]]></search>
+			<add position="after"><![CDATA[
+			if (strpos($this->request->server['REQUEST_URI'],'.webp')) {
+
+			    $file = pathinfo($this->request->server['REQUEST_URI']);
+			    $file = $this->request->server['DOCUMENT_ROOT'].'/'.$file['dirname'].'/'.$file['filename'];
+			    if (!file_exists($this->request->server['REQUEST_URI'])) {
+				     $file = urldecode($file);
+			        if (file_exists($file.'.gif')) {
+			            $iimage = imagecreatefromgif($file.'.gif');
+			        } elseif (file_exists($file.'.png')) {
+			            $iimage = imagecreatefrompng($file.'.png');
+			        } elseif (file_exists($file.'.jpg')) {
+			            $iimage = imagecreatefromjpeg($file.'.jpg');
+			        } elseif (file_exists($file.'.jpeg')) {
+			            $iimage = imagecreatefromjpeg($file.'.jpeg');
+			        }
+		        
+					if(!$iimage){
+						exit('Error: Could not load image ' . $file . '!');
+					}
+					
+			        imagewebp($iimage, $this->request->server['DOCUMENT_ROOT'].'/'.$this->request->server['REQUEST_URI']);
+			        header('Content-type:image/webp');
+			        imagewebp($iimage);
+			        
+			        die();
+			
+			    } else {
+			        exit('Error: Could not load image ' . $file . '!');
+			    }
+			}
+			]]></add>
+		</operation>
+	</file>
+	<file path="catalog/controller/common/header.php">
+		<operation>
+			<search><![CDATA[public function index() {]]></search>
+			<add position="after"><![CDATA[
+			if (strpos($this->request->server['REQUEST_URI'],'.webp')) {
+			    $file = pathinfo($this->request->server['REQUEST_URI']);
+			    $file = $this->request->server['DOCUMENT_ROOT'].'/'.$file['dirname'].'/'.$file['filename'];
+			    if (!file_exists($this->request->server['REQUEST_URI'])) {
+				     $file = urldecode($file);
+			        if (file_exists($file.'.gif')) {
+			            $iimage = imagecreatefromgif($file.'.gif');
+			        } elseif (file_exists($file.'.png')) {
+			            $iimage = imagecreatefrompng($file.'.png');
+			        } elseif (file_exists($file.'.jpg')) {
+			            $iimage = imagecreatefromjpeg($file.'.jpg');
+			        } elseif (file_exists($file.'.jpeg')) {
+			            $iimage = imagecreatefromjpeg($file.'.jpeg');
+			        }
+			        
+					if(!$iimage){
+						exit('Error: Could not load image ' . $file . '!');
+					}
+					
+			        imagewebp($iimage, $this->request->server['DOCUMENT_ROOT'].'/'.$this->request->server['REQUEST_URI']);
+			        
+			        header('Content-type:image/webp');
+			        imagewebp($iimage);
+			        
+			        die();
+			
+			    } else {
+			        exit('Error: Could not load image ' . $file . '!');
+			    }
+			}
+			]]></add>
+		</operation>
+	</file>
+	<file path="system/library/response.php">
+		<operation>
+			<search><![CDATA[$this->output = $output;]]></search>
+			<add position="before"><![CDATA[
+			if (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp')) {
+				$output = preg_replace('/\b.jpg\b/u', '.webp', $output);
+				//$output = preg_replace('/\b.png\b/u', '.webp', $output);
+				$output = preg_replace('/\b.jpeg\b/u', '.webp', $output);
+			}
+			]]></add>
+		</operation>
+	</file>
+	<file path="system/library/image.php">
+		<operation>
+			<search><![CDATA[if ($this->mime == 'image/gif') {]]></search>
+			<add position="replace"><![CDATA[
+			if ($this->mime == 'image/webp') {
+				$this->image = imagecreatefromwebp($file);
+			} elseif ($this->mime == 'image/gif') {
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if ($extension == 'jpeg' || $extension == 'jpg') {]]></search>
+			<add position="replace"><![CDATA[
+			if ($extension == 'webp') {
+				imagewebp($this->image, $file);
+			} elseif ($extension == 'jpeg' || $extension == 'jpg') {
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="catalog/model/tool/image.php">
+		<operation>
+			<search><![CDATA[$image_new = 'cache/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-' . (int)$width . 'x' . (int)$height . '.' . $extension;]]></search>
+			<add position="before"><![CDATA[
+			if ($extension == 'jpg') {$extension = 'webp';}
+			]]></add>
+		</operation>
+	</file>
+
+</modification>

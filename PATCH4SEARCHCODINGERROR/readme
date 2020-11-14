@@ -1,0 +1,17 @@
+﻿            //by Novikov - кодировк слетала при редиректе на ISO8859 из за NGINX настроек провайдера
+            // команду вида header("Location: https://lanosok.kiev.ua/search/?search=тест"); бьют кодировку и менять не хотят
+            // КОСТЫЛЬзр
+            //                echo "<script>document.location.href = '$seo'</script>";
+            //                echo "<!-- костыль, ибо php header location  бьет кодировку в ISO8859 -->\n";
+            $link = parse_url($seo, PHP_URL_QUERY);
+            parse_str($link, $output);
+            //
+            if (isset($output['search'])) {
+                $output['search'] = rawurlencode($output['search']);
+                $seo = substr($seo, 0, strpos($seo, '?') + 1) . "search={$output['search']}";
+            }
+            if (isset($output['filter_name'])) {
+                $output['filter_name'] = rawurlencode($output['filter_name']);
+                $seo = substr($seo, 0, strpos($seo, '?') + 1) . "filter_name={$output['filter_name']}";
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////
